@@ -102,15 +102,15 @@
       const ok = min === 0 || (+r.dataset.from <= min && min <= +r.dataset.to);
       r.classList.toggle('match', min > 0 && ok);
       r.classList.toggle('dimmed', min > 0 && !ok);
-      $('.mark', r).style.setProperty('--m', (min / 180) * 100 + '%');
+      $('.mark', r).style.setProperty('--m', (min / 120) * 100 + '%');
       if (ok) matched.push(r);
     });
     if (min === 0) {
-      result.innerHTML = '<b>5 systems</b> available. Select a fire class to filter.';
+      result.innerHTML = `<b>${rows.length} families</b> available. Select a fire class to filter.`;
     } else if (matched.length === 1) {
       result.innerHTML = `<b>EI${min}</b> — only <b>${names(matched)[0]}</b> covers this class. We’ll confirm the exact assembly for your project.`;
     } else {
-      result.innerHTML = `<b>EI${min}</b> — covered by <b>${matched.length} systems</b>: ${names(matched).join(', ')}.`;
+      result.innerHTML = `<b>EI${min}</b> — covered by <b>${matched.length} families</b>: ${names(matched).join(', ')}.`;
     }
   };
   chips.forEach((c) => c.addEventListener('click', () => {
@@ -121,8 +121,6 @@
   /* ---------- projects: hover preview ---------- */
   const projs = $$('.proj');
   const frame = $('.pv-frame');
-  const imgA = $('#pvA');
-  const imgB = $('#pvB');
   const cap = $('#pvCap');
   const num = $('#pvNum');
   let current = 0;
@@ -130,20 +128,37 @@
   const preload = (src) => { const i = new Image(); i.src = src; };
   projs.forEach((p) => preload(p.dataset.img));
 
-  let swapTimer = 0;
+  // Each switch stacks a fresh <img> on top and fades it in over the current one.
+  // The old layer is never touched until the new one is fully opaque, so there is
+  // no src swap, no reset and no jump — even on rapid hovering.
+  const pvCorners = $$('.pv-corner', frame);
+  const addLayer = (src, token) => {
+    const img = new Image();
+    img.className = 'pv-img';
+    img.alt = '';
+    img.decoding = 'async';
+    img.src = src;
+    const show = () => {
+      if (token !== current) return; // a newer project was already requested
+      frame.insertBefore(img, pvCorners[0]);
+      img.getBoundingClientRect(); // commit the initial (transparent) state
+      img.classList.add('on');
+      const cleanup = () => {
+        let n = img.previousElementSibling;
+        while (n) { const prev = n.previousElementSibling; if (n.classList.contains('pv-img')) n.remove(); n = prev; }
+      };
+      img.addEventListener('transitionend', (e) => { if (e.propertyName === 'opacity') cleanup(); }, { once: true });
+      setTimeout(cleanup, 1600);
+    };
+    (img.decode ? img.decode().catch(() => {}) : Promise.resolve()).then(show);
+  };
+
   const showProject = (i) => {
     if (i === current) return;
     current = i;
     const p = projs[i];
     projs.forEach((x) => x.classList.toggle('is-active', x === p));
-    // rapid hovering: cancel the previous swap and always land on the latest project
-    clearTimeout(swapTimer);
-    imgB.src = p.dataset.img;
-    frame.classList.add('swap');
-    swapTimer = setTimeout(() => {
-      imgA.src = projs[current].dataset.img;
-      frame.classList.remove('swap');
-    }, 620);
+    addLayer(p.dataset.img, i);
     cap.textContent = p.dataset.cap;
     num.textContent = `${pad(i + 1)} / ${pad(projs.length)}`;
   };
@@ -207,7 +222,7 @@
       '',
       '(Drawings attached separately)'
     ].join('\n');
-    location.href = `mailto:export@aldens.lv?subject=${encodeURIComponent('Quote request — ' + name)}&body=${encodeURIComponent(body)}`;
+    location.href = `mailto:aldens@aldens.lv?subject=${encodeURIComponent('Quote request — ' + name)}&body=${encodeURIComponent(body)}`;
     $('#fnote').textContent = 'Opening your email app… attach drawings there.';
   });
   $$('input, textarea', form).forEach((el) => el.addEventListener('input', () => { el.classList.remove('invalid'); el.removeAttribute('aria-invalid'); }));

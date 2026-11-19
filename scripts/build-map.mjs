@@ -14,17 +14,19 @@ const countries = feature(simp, simp.objects.countries).features;
 const W = 1000;
 const H = 720;
 
-// Installation geography (aldens.eu/installation) + Latvia (HQ) + France/Monaco (reference projects)
-const INSTALL = ['Sweden', 'Belgium', 'Denmark', 'Luxembourg', 'Finland', 'United Kingdom', 'Norway', 'Ireland', 'Netherlands', 'Iceland'];
+// Geography from aldens.lv: Latvia (HQ), countries with a local representative (contacts page)
+// and countries with completed projects (realised-projects list).
 const HQ = 'Latvia';
-const REF = ['France'];
+const INSTALL = ['Norway', 'Germany']; // local representatives: Nye Trysil Bygg AS, JAKA Bau Berlin GmbH
+const REF = ['Lithuania', 'Sweden', 'United Kingdom', 'Belgium', 'Italy', 'Monaco'];
 
 const pins = [
-  { id: 'riga', label: 'Riga — HQ & production', coord: [24.1052, 56.9496], hq: true, dx: 14, dy: 4 },
-  { id: 'monaco', label: 'Monaco · Nice', coord: [7.42, 43.74], dx: 14, dy: 4 },
-  { id: 'hemsedal', label: 'Hemsedal', coord: [8.4, 60.86], dx: -14, dy: -8, anchor: 'end' },
-  { id: 'iceland', label: 'Iceland', coord: [-19.0, 64.9], dx: 14, dy: -6 },
-  { id: 'stockholm', label: 'Sweden', coord: [16.5, 59.6], dx: -14, dy: 18, anchor: 'end' }
+  { id: 'riga', label: 'Riga — HQ & factory', coord: [24.1052, 56.9496], hq: true, dx: 14, dy: 4 },
+  { id: 'trysil', label: 'Trysil · rep', coord: [12.27, 61.31], dx: -14, dy: -8, anchor: 'end' },
+  { id: 'berlin', label: 'Berlin · rep', coord: [13.4, 52.52], dx: 14, dy: 16 },
+  { id: 'sweden', label: 'Sweden', coord: [16.5, 59.4], dx: -14, dy: 18, anchor: 'end' },
+  { id: 'london', label: 'London', coord: [-0.13, 51.5], dx: -14, dy: 4, anchor: 'end' },
+  { id: 'monaco', label: 'Monaco', coord: [7.42, 43.74], dx: 14, dy: 4 }
 ];
 
 const projection = geoConicConformal()
@@ -36,13 +38,13 @@ const projection = geoConicConformal()
       [10, 10],
       [W - 10, H - 10]
     ],
-    { type: 'MultiPoint', coordinates: [[-25, 64], [-12, 52], [6, 41], [34, 58], [32, 70], [14, 71.5]] }
+    { type: 'MultiPoint', coordinates: [[-12, 60], [-9, 50], [5, 41], [34, 55], [30, 66], [14, 69]] }
   );
 
 const path = geoPath(projection).digits(1);
 
 const out = [];
-out.push(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Map of Europe: Aldens installation geography" class="map-svg">`);
+out.push(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Map of Europe: Aldens project geography" class="map-svg">`);
 out.push(`<defs><clipPath id="mapclip"><rect width="${W}" height="${H}"/></clipPath></defs>`);
 out.push(`<g clip-path="url(#mapclip)">`);
 out.push(`<path class="grat" d="${path(geoGraticule10())}"/>`);
