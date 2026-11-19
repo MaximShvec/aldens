@@ -44,7 +44,7 @@ const projection = geoConicConformal()
 const path = geoPath(projection).digits(1);
 
 const out = [];
-out.push(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Map of Europe: Aldens project geography" class="map-svg">`);
+out.push(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Карта Европы: география проектов Aldens" class="map-svg">`);
 out.push(`<defs><clipPath id="mapclip"><rect width="${W}" height="${H}"/></clipPath></defs>`);
 out.push(`<g clip-path="url(#mapclip)">`);
 out.push(`<path class="grat" d="${path(geoGraticule10())}"/>`);

@@ -105,12 +105,18 @@
       $('.mark', r).style.setProperty('--m', (min / 120) * 100 + '%');
       if (ok) matched.push(r);
     });
+    const word = (n) => {
+      const n10 = n % 10, n100 = n % 100;
+      if (n10 === 1 && n100 !== 11) return 'семейство';
+      if (n10 >= 2 && n10 <= 4 && (n100 < 12 || n100 > 14)) return 'семейства';
+      return 'семейств';
+    };
     if (min === 0) {
-      result.innerHTML = `<b>${rows.length} families</b> available. Select a fire class to filter.`;
+      result.innerHTML = `Доступно <b>${rows.length} ${word(rows.length)}</b>. Выберите класс, чтобы отфильтровать.`;
     } else if (matched.length === 1) {
-      result.innerHTML = `<b>EI${min}</b> — only <b>${names(matched)[0]}</b> covers this class. We’ll confirm the exact assembly for your project.`;
+      result.innerHTML = `<b>EI${min}</b> — этот класс закрывает только <b>${names(matched)[0]}</b>. Точный узел подтвердим под ваш проект.`;
     } else {
-      result.innerHTML = `<b>EI${min}</b> — covered by <b>${matched.length} families</b>: ${names(matched).join(', ')}.`;
+      result.innerHTML = `<b>EI${min}</b> — класс закрывают <b>${matched.length} ${word(matched.length)}</b>: ${names(matched).join(', ')}.`;
     }
   };
   chips.forEach((c) => c.addEventListener('click', () => {
@@ -188,7 +194,7 @@
         p.addEventListener('mouseleave', off);
       });
     })
-    .catch(() => { mapEl.innerHTML = '<p style="padding:24px;color:var(--muted)">Map unavailable.</p>'; });
+    .catch(() => { mapEl.innerHTML = '<p style="padding:24px;color:var(--muted)">Карта недоступна.</p>'; });
 
   /* ---------- RFQ form -> mailto (no backend needed for the concept) ---------- */
   const form = $('#rfq');
@@ -206,24 +212,24 @@
       if (!v && !firstBad) firstBad = input;
     });
     if (firstBad) {
-      $('#fnote').textContent = 'Please add your name and a valid email so we can reply.';
+      $('#fnote').textContent = 'Укажите имя и корректную почту — так мы сможем ответить.';
       firstBad.focus();
       return;
     }
     const types = fd.getAll('type').join(', ') || '—';
     const body = [
-      `Name: ${name}`,
-      `Company: ${fd.get('company') || '—'}`,
-      `Email: ${email}`,
-      `Phone: ${fd.get('phone') || '—'}`,
-      `Needs: ${types}`,
+      `Имя: ${name}`,
+      `Компания: ${fd.get('company') || '—'}`,
+      `Эл. почта: ${email}`,
+      `Телефон: ${fd.get('phone') || '—'}`,
+      `Нужно: ${types}`,
       '',
       (fd.get('msg') || '').toString(),
       '',
-      '(Drawings attached separately)'
+      '(Чертежи приложу отдельно)'
     ].join('\n');
-    location.href = `mailto:aldens@aldens.lv?subject=${encodeURIComponent('Quote request — ' + name)}&body=${encodeURIComponent(body)}`;
-    $('#fnote').textContent = 'Opening your email app… attach drawings there.';
+    location.href = `mailto:aldens@aldens.lv?subject=${encodeURIComponent('Запрос расчёта — ' + name)}&body=${encodeURIComponent(body)}`;
+    $('#fnote').textContent = 'Открываем почтовую программу… чертежи приложите там.';
   });
   $$('input, textarea', form).forEach((el) => el.addEventListener('input', () => { el.classList.remove('invalid'); el.removeAttribute('aria-invalid'); }));
 
